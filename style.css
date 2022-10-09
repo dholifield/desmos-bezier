@@ -14,7 +14,7 @@ body {
   margin: 0;
   min-width: 300px;
 }
-
+/*
 h1 {
   font-family: timeburner;
   font-size: 100px;
@@ -31,16 +31,25 @@ p {
   color: lightslategray;
   text-align: center;
 }
+*/
 
-.container {
-  height: calc(90vh - 50px);
-  position: relative;
+.calc {
+  width: calc(100vh - 200px);
+  height: calc(100vh - 200px);
+  margin: 100px auto 0 auto;
 }
 
-.vert-center {
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+button {
+  font-family: robotomono;
+  color: black;
+  background: white;
+  text-decoration: none;
+  border: none;
+  border-radius: 3px;
+  padding: 5px 10px;
+  margin: 5px;
+}
+
+button:hover {
+  background: #ddd;
 }

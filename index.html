@@ -1,27 +1,21 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <meta name="description" content="coming soon">
-    <meta name="keywords" content="Dominic Holified">
-    <meta name="viewport" content="width=device-width, initial-scale=0.80">
-    <title>odom</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="icon.png" type="images/x-icon">
-  </head>
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="bezier curves">
+        <meta name="viewport" content="width=device-width, initial-scale=0.80">
+        <title>odom</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="icon" href="icon.png" type="images/x-icon">
+        <!-- include desmos javascript -->
+        <script src="https://www.desmos.com/api/v1.7/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+    </head>
 
-  <body>
-    <header>
-     
-    </header>
-
-    <main>
-      <div class="container">
-        <div class="vert-center">
-          <h1>odom.tech</h1>
-          <p>(coming soon)</p>
-        </div>
-      </div>
-    </main>
-  </body>
+    <body>
+        <div id="calculator" style="width: calc(100vh - 200px); height: calc(100vh - 200px); margin: 100px auto; margin-bottom: 10px;"></div>
+        <script src="js/bezier.js"></script>
+        <!--<script src="js/desmos.js"></script>-->
+        <button onclick="b1.unfocus()">unfocus</button>
+        <button onclick="b1.focus()">focus</button>
+    </body>
 </html>
