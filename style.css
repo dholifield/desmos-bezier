@@ -64,9 +64,17 @@ button.B:hover {
 
 button.bez {
   background: #888;
-   color: white;
+  color: white;
 }
 
 button.bez:hover {
   background: #666;
+}
+
+button.deselect {
+  background: #e98e8e;
+}
+
+button.deselect:hover {
+  background: #d96d6d;
 }

@@ -231,9 +231,9 @@ export default class BezierSet {
     constructor() {
         this.beziers = [];
     }
-    // Gets the nth bezier curve
-    get(n) {
-        return this.beziers[n];
+    // Gets the kth bezier curve
+    get(k) {
+        return this.beziers[k];
     }
      // Focuses on the selected bezier curve
     updateFocus() {
@@ -250,12 +250,11 @@ export default class BezierSet {
         let b = new Bezier();
         this.beziers.push(b);
         b.addSegment();
-        selected = n;
-        this.updateFocus();
+        this.select(n);
         n++;
     }
     // Deletes the selected bezier curve
-    removeBezier(n) {
+    removeBezier() {
         if (selected != -1) {
             this.beziers[selected].delete();
             this.beziers.splice(selected, 1);
@@ -264,16 +263,19 @@ export default class BezierSet {
         } else {
             alert('No curve selected');
         }
+        this.deselect();
     }
     // Set selected bezier curve
-    select(n) {
-        selected = n;
+    select(k) {
+        selected = k;
         this.updateFocus();
     }
     // Deselct bezier curve
     deselect() {
         selected = -1;
         this.updateFocus();
+        // Hide deselect button
+        deselect_button.style.display = 'none';
     }
     // Add a new point to the selected bezier curve
     addPoint() {
