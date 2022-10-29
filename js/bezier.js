@@ -1,13 +1,3 @@
-var elt = document.getElementById('calculator');
-var calculator = Desmos.GraphingCalculator(elt, {lockViewport: 1, expressions: 0, settingsMenu: 0, zoomButtons: 0});
-calculator.setGraphSettings({xAxisStep: 12, yAxisStep: 12});
-calculator.setMathBounds({left: 0, right: 144, bottom: 0, top: 144})
-
-calculator.setExpression({id: 'line', latex: 'L\\left(a,b,t\\right)=\\left(1-t\\right)a+tb'});
-calculator.setExpression({id: 'bez', latex: 'B\\left(a_{1},a_{2},w_{1},w_{2},t\\right)=\\left(1-t\\right)\\left(\\left(1-t\\right)\\left(\\left(1-t\\right)a_{1}+tL\\left(w_{1},a_{1},2\\right)\\right)\\ +t\\left(\\left(1-t\\right)L\\left(w_{1},a_{1},2\\right)+tw_{2}\\right)\\right)+t\\left(\\left(1-t\\right)\\left(\\left(1-t\\right)L\\left(w_{1},a_{1},2\\right)+tw_{2}\\right)+t\\left(\\left(1-t\\right)w_{2}+ta_{2}\\right)\\right)'});
-calculator.setExpression({id: 'bez_total', latex: 'B_{ez}\\left(a,w,t\\right)=\\left(\\sum_{n=\\left[1...\\operatorname{length}\\left(a\\right)-1\\right]}^{\\left[1...\\operatorname{length}\\left(a\\right)-1\\right]}B\\left(a\\left[n\\right],a\\left[n+1\\right],w\\left[n\\right],w\\left[n+1\\right],t\\right).x,\\sum_{n=\\left[1...\\operatorname{length}\\left(a\\right)-1\\right]}^{\\left[1...\\operatorname{length}\\left(a\\right)-1\\right]}B\\left(a\\left[n\\right],a\\left[n+1\\right],w\\left[n\\right],w\\left[n+1\\right],t\\right).y\\right)'});
-calculator.setExpression({id: 'end_pts', latex: 'E\\left(a\\right)=\\left(\\sum_{n=\\left[1,\\operatorname{length}\\left(a\\right)\\right]}^{\\left[1,\\operatorname{length}\\left(a\\right)\\right]}a\\left[n\\right].x,\\sum_{n=\\left[1,\\operatorname{length}\\left(a\\right)\\right]}^{\\left[1,\\operatorname{length}\\left(a\\right)\\right]}a\\left[n\\right].y\\right)'});
-
 function updateTable(id, x, y, c) {
     calculator.setExpression({
         id: id,
@@ -50,73 +40,255 @@ function showTable(id) {
     });
 }
 
-var n = 1;
+var n = 0;
 
-class Bezier {
-    constructor(id) {
-        this.id = id;
-        this.anchor_x = ['50', '70', '90'];
-        this.anchor_y = ['70', '70', '70'];
-        this.weight_x = ['50', '70', '90'];
-        this.weight_y = ['90', '90', '90'];
-        // Anchor points table
-        updateTable(`a${this.id}`, this.anchor_x, this.anchor_y, '#000000');
-        // Weight points table
-        updateTable(`w${this.id}`, this.weight_x, this.weight_y, '#2d70b3');
-        // Bezier curve
+export class Bezier {
+    constructor() {
+        this.id = n;
+        this.name = 'Bezier ' + n;
+        this.anchor_x = [];
+        this.anchor_y = [];
+        this.weight_x = [];
+        this.weight_y = [];
+        // Create the tables
+        this.update();
+        // Create the bezier curve
         calculator.setExpression({
             id: this.id+'_bez', 
             latex: 'B_{ez}\\left(\\left(x_{a'+this.id+'},y_{a'+this.id+'}\\right),\\left(x_{w'+this.id+'},y_{w'+this.id+'}\\right),t\\right)',
             color: '#000000'
         });
-        // Weight lines
+        // Create the weight lines
         calculator.setExpression({
             id: this.id+'_lines',
             latex: 'L\\left(\\left(x_{w'+this.id+'},y_{w'+this.id+'}\\right),\\left(x_{a'+this.id+'},y_{a'+this.id+'}\\right),2t\\right)',
-            color: '#2d70b3',
-            lineStyle: Desmos.Styles.DASHED,
-            lineOpacity: 0.3,
+            color: '#000000',
+            lineOpacity: 0.2,
             lineWidth: 2
         });
-        // Mirrored points
+        // Create the mirror points
         calculator.setExpression({
             id: this.id+'_m_pts',
             latex: 'L\\left(\\left(x_{w'+this.id+'},y_{w'+this.id+'}\\right),\\left(x_{a'+this.id+'},y_{a'+this.id+'}\\right),2\\right)',
-            color: '#2d70b3'
+            color: '#000000'
         });
-        // End points
+        // Create the endpoints
         calculator.setExpression({
             id: this.id+'_ends',
             latex: 'E\\left(\\left(x_{a'+this.id+'},y_{a'+this.id+'}\\right)\\right)',
             color: '#000000',
             hidden: true
-        })
-        
+        });
+        // Create selection button
+        this.button = document.createElement('button');
+        this.button.innerHTML = this.name;
+        this.button.className = 'bez';
+        this.button.onclick = () => {
+            B.select(this.id);
+        }
+        document.body.appendChild(this.button);
     }
-
+    // Sets the display name of the curve
+    setName(name) {
+        this.name = name;
+    }
+    // Gets the points from the Desmos tables
+    getPoints() {
+        this.anchor_x = calculator.getExpressions().find(e=> e.id == 'a'+this.id).columns[0].values;
+        this.anchor_y = calculator.getExpressions().find(e=> e.id == 'a'+this.id).columns[1].values;
+        this.weight_x = calculator.getExpressions().find(e=> e.id == 'w'+this.id).columns[0].values;
+        this.weight_y = calculator.getExpressions().find(e=> e.id == 'w'+this.id).columns[1].values;
+    }
+    // Sets the points in the Desmos tables
+    update() {
+        updateTable('a'+this.id, this.anchor_x, this.anchor_y, '#000000');
+        updateTable('w'+this.id, this.weight_x, this.weight_y, '#2d70b3');
+    }
+    // Hides points
+    hide() {
+        hideTable('a'+this.id);
+        hideTable('w'+this.id);
+        calculator.setExpression({id: this.id+'_m_pts', hidden: true});
+        calculator.setExpression({id: this.id+'_ends', hidden: false});
+    }
+    // Hides the points and lines
     unfocus() {
-        hideTable(`a${this.id}`)
-        hideTable(`w${this.id}`)
+        hideTable('a'+this.id)
+        hideTable('w'+this.id)
         calculator.setExpression({id: this.id+'_lines', hidden: true});
         calculator.setExpression({id: this.id+'_m_pts', hidden: true});
         calculator.setExpression({id: this.id+'_ends', hidden: false});
     }
-
+    // Shows the points and lines
     focus() {
-        showTable(`a${this.id}`);
-        showTable(`w${this.id}`);
+        showTable('a'+this.id);
+        showTable('w'+this.id);
         calculator.setExpression({id: this.id+'_lines', hidden: false});
         calculator.setExpression({id: this.id+'_m_pts', hidden: false});
         calculator.setExpression({id: this.id+'_ends', hidden: true});
     }
-
+    // Add a new point to the end of the curve
     add(ax, ay, wx, wy) {
+        this.getPoints();
         this.anchor_x.push(ax);
         this.anchor_y.push(ay);
         this.weight_x.push(wx);
         this.weight_y.push(wy);
+        this.update();
+    }
+    // Remove the last point from the curve
+    remove() {
+        this.getPoints();
+        this.anchor_x.splice(-1,1);
+        this.anchor_y.splice(-1,1);
+        this.weight_x.splice(-1,1);
+        this.weight_y.splice(-1,1);
+        this.update();
+    }
+    // Set last weight point
+    setWeight(x, y) {
+        this.getPoints();
+        this.weight_x[this.weight_x.length-1] = x;
+        this.weight_y[this.weight_y.length-1] = y;
+        this.update();
+    }
+    // Finds and adds location of a new point
+    addSegment() {
+        if (adding) return;
+        adding = true;
+
+        this.getPoints();
+        if (this.anchor_x.length > 0) {
+            this.hide();
+            calculator.setExpression({
+                id: 'temp_line',
+                latex: `L\\left(C,\\left(${this.anchor_x[this.anchor_x.length-1]},${this.anchor_y[this.anchor_y.length-1]}\\right),t\\right)`,
+                lineOpacity: 0.2,
+                color: '#000000'
+            });
+        } else {
+            calculator.setExpression({
+                id: 'temp_pt',
+                latex: 't_{mp}=C',
+                pointOpacity: 0.4,
+                color: '#000000'
+            });
+        }
+
+        // Create listener for mouse clicks
+        document.addEventListener('click', function anchorListener () {
+            var graph = calculator.graphpaperBounds.mathCoordinates;
+            var point = mousePos;
+            if (!(point.x >= graph.left && point.x <= graph.right && point.y >= graph.bottom && point.y <= graph.top)) return
+            B.get(selected).add(point.x, point.y, 'C.x', 'C.y');
+
+            // Show lines and points
+            calculator.setExpression({
+                id: 'temp_line',
+                latex: `L\\left(C,\\left(${point.x},${point.y}\\right),2t\\right)`,
+                lineOpacity: 0.2,
+                color: '#000000'
+            });
+            calculator.setExpression({
+                id: 'temp_pt',
+                latex: `L\\left(C,\\left(${point.x},${point.y}\\right),2\\right)`,
+                color: '#000000'
+            });
+            calculator.setExpression({
+                id: 'cursor_pt', 
+                hidden: false
+            });
+
+            // Listener for weight point
+            document.addEventListener('click', function weightListener () {
+                B.get(selected).setWeight(mousePos.x, mousePos.y);
+                B.get(selected).focus();
+                // Remove lines and points
+                calculator.removeExpression({id: 'temp_line'});
+                calculator.removeExpression({id: 'temp_pt'});
+                calculator.setExpression({id: 'cursor_pt', hidden: true});
+                adding = false;
+                document.removeEventListener('click', weightListener);
+            });
+
+            document.removeEventListener('click', anchorListener);
+        });
+
+    }
+    // Deletes the bezier curve
+    delete() {
+        calculator.removeExpression({id: this.id+'_bez'});
+        calculator.removeExpression({id: this.id+'_lines'});
+        calculator.removeExpression({id: this.id+'_m_pts'});
+        calculator.removeExpression({id: this.id+'_ends'});
+        calculator.removeExpression({id: 'a'+this.id});
+        calculator.removeExpression({id: 'w'+this.id});
+        this.button.remove();
     }
 }
 
-let b1 = new Bezier(n++);
-
+export default class BezierSet {
+    constructor() {
+        this.beziers = [];
+    }
+    // Gets the nth bezier curve
+    get(n) {
+        return this.beziers[n];
+    }
+     // Focuses on the selected bezier curve
+    updateFocus() {
+        deselect_button.style.display = 'inline-block';
+        for (let i = 0; i < this.beziers.length; i++) {
+            this.beziers[i].unfocus();
+        }
+        if (selected != -1) {
+            this.beziers[selected].focus();
+        }
+    }
+    // Adds a new bezier curve
+    addBezier() {
+        let b = new Bezier();
+        this.beziers.push(b);
+        b.addSegment();
+        selected = n;
+        this.updateFocus();
+        n++;
+    }
+    // Deletes the selected bezier curve
+    removeBezier(n) {
+        if (selected != -1) {
+            this.beziers[selected].delete();
+            this.beziers.splice(selected, 1);
+            selected = -1;
+            this.updateFocus();
+        } else {
+            alert('No curve selected');
+        }
+    }
+    // Set selected bezier curve
+    select(n) {
+        selected = n;
+        this.updateFocus();
+    }
+    // Deselct bezier curve
+    deselect() {
+        selected = -1;
+        this.updateFocus();
+    }
+    // Add a new point to the selected bezier curve
+    addPoint() {
+        if (selected != -1) {
+            this.beziers[selected].addSegment();
+        } else {
+            alert('No curve selected');
+        }
+    }
+    // Remove a point from the selected bezier curve
+    removePoint() {
+        if (selected != -1) {
+            this.beziers[selected].remove();
+        } else {
+            alert('No curve selected');
+        }
+    }
+}

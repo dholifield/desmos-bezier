@@ -53,3 +53,20 @@ button {
 button:hover {
   background: #ddd;
 }
+
+button.B {
+  background: #9db8e0;
+}
+
+button.B:hover {
+  background: #7d9bcf;
+}
+
+button.bez {
+  background: #888;
+   color: white;
+}
+
+button.bez:hover {
+  background: #666;
+}

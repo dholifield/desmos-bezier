@@ -13,9 +13,11 @@
 
     <body>
         <div id="calculator" style="width: calc(100vh - 200px); height: calc(100vh - 200px); margin: 100px auto; margin-bottom: 10px;"></div>
-        <script src="js/bezier.js"></script>
-        <!--<script src="js/desmos.js"></script>-->
-        <button onclick="b1.unfocus()">unfocus</button>
-        <button onclick="b1.focus()">focus</button>
+        <script type="module" defer src="js/main.js"></script>
+
+        <button onclick="B.addPoint()">add point</button>
+        <button onclick="B.removePoint()">remove point</button>
+        <button class="B" onclick="B.addBezier()">add bezier</button>
+        <button class="B" onclick="B.removeBezier(selected)">remove bezier</button>
     </body>
 </html>
