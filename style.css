@@ -78,3 +78,16 @@ button.deselect {
 button.deselect:hover {
   background: #d96d6d;
 }
+
+input {
+  font-family: robotomono;
+  color: gray;
+  background: white;
+  text-align: center;
+  width: 100px;
+  height: 26px;
+  border: none;
+  border-radius: 3px;
+  margin: 5px;
+  text-decoration: underline;
+}

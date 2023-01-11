@@ -45,7 +45,8 @@ var n = 0;
 export class Bezier {
     constructor() {
         this.id = n;
-        this.name = 'Bezier ' + n;
+        this.color = color_text.value;
+        this.name = 'bezier ' + n;
         this.anchor_x = [];
         this.anchor_y = [];
         this.weight_x = [];
@@ -55,8 +56,8 @@ export class Bezier {
         // Create the bezier curve
         calculator.setExpression({
             id: this.id+'_bez', 
-            latex: 'B_{ez}\\left(\\left(x_{a'+this.id+'},y_{a'+this.id+'}\\right),\\left(x_{w'+this.id+'},y_{w'+this.id+'}\\right),t\\right)',
-            color: '#000000'
+            latex: 'B\\left(\\left(x_{a'+this.id+'},y_{a'+this.id+'}\\right),\\left(x_{w'+this.id+'},y_{w'+this.id+'}\\right),t\\right)',
+            color: this.color
         });
         // Create the weight lines
         calculator.setExpression({
@@ -72,13 +73,6 @@ export class Bezier {
             latex: 'L\\left(\\left(x_{w'+this.id+'},y_{w'+this.id+'}\\right),\\left(x_{a'+this.id+'},y_{a'+this.id+'}\\right),2\\right)',
             color: '#000000'
         });
-        // Create the endpoints
-        calculator.setExpression({
-            id: this.id+'_ends',
-            latex: 'E\\left(\\left(x_{a'+this.id+'},y_{a'+this.id+'}\\right)\\right)',
-            color: '#000000',
-            hidden: true
-        });
         // Create selection button
         this.button = document.createElement('button');
         this.button.innerHTML = this.name;
@@ -88,9 +82,29 @@ export class Bezier {
         }
         document.body.appendChild(this.button);
     }
-    // Sets the display name of the curve
+    // Set the display name of the curve
     setName(name) {
+        if (name.length == 0) {
+            alert('please enter a name');
+            name_text.value = this.name;
+            return;
+        }
         this.name = name;
+        this.button.innerHTML = this.name;
+    }
+    // Set the color of the curve and points
+    setColor(c) {
+        if (c.indexOf('#') == -1) c = '#' + c;
+        if (c.length != 4 && c.length != 7) {
+            alert('incorrect color format [hex]');
+            color_text.value = this.color;
+            return;
+        }
+        this.color = c;
+        calculator.setExpression({id: this.id+'_bez', color: this.color});
+        this.getPoints();
+        this.update();
+        //calculator.setExpression({id: 'a'+this.id, type: 'table', columns: [{latex: `x_{${id}}`, values: x}, {latex: `y_{${id}}`, values: y, dragMode: Desmos.DragModes.XY, color: c}]});
     }
     // Gets the points from the Desmos tables
     getPoints() {
@@ -101,31 +115,32 @@ export class Bezier {
     }
     // Sets the points in the Desmos tables
     update() {
-        updateTable('a'+this.id, this.anchor_x, this.anchor_y, '#000000');
-        updateTable('w'+this.id, this.weight_x, this.weight_y, '#2d70b3');
+        updateTable('a'+this.id, this.anchor_x, this.anchor_y, this.color);
+        updateTable('w'+this.id, this.weight_x, this.weight_y, '#000000');
     }
     // Hides points
     hide() {
         hideTable('a'+this.id);
         hideTable('w'+this.id);
         calculator.setExpression({id: this.id+'_m_pts', hidden: true});
-        calculator.setExpression({id: this.id+'_ends', hidden: false});
     }
     // Hides the points and lines
     unfocus() {
+        this.getPoints();
         hideTable('a'+this.id)
         hideTable('w'+this.id)
         calculator.setExpression({id: this.id+'_lines', hidden: true});
         calculator.setExpression({id: this.id+'_m_pts', hidden: true});
-        calculator.setExpression({id: this.id+'_ends', hidden: false});
     }
     // Shows the points and lines
     focus() {
+        //color_button.style.display = 'inline-block'
         showTable('a'+this.id);
         showTable('w'+this.id);
         calculator.setExpression({id: this.id+'_lines', hidden: false});
         calculator.setExpression({id: this.id+'_m_pts', hidden: false});
-        calculator.setExpression({id: this.id+'_ends', hidden: true});
+        color_text.value = this.color;
+        name_text.value = this.name;
     }
     // Add a new point to the end of the curve
     add(ax, ay, wx, wy) {
@@ -220,7 +235,6 @@ export class Bezier {
         calculator.removeExpression({id: this.id+'_bez'});
         calculator.removeExpression({id: this.id+'_lines'});
         calculator.removeExpression({id: this.id+'_m_pts'});
-        calculator.removeExpression({id: this.id+'_ends'});
         calculator.removeExpression({id: 'a'+this.id});
         calculator.removeExpression({id: 'w'+this.id});
         this.button.remove();
@@ -235,9 +249,18 @@ export default class BezierSet {
     get(k) {
         return this.beziers[k];
     }
-     // Focuses on the selected bezier curve
+    // Set the color of the selected bezier curve
+    setColor(color) {
+        if (selected != -1)
+            this.beziers[selected].setColor(color);
+    }
+    // Set the name of the selected bezier curve
+    setName(name) {
+        if (selected != -1)
+            this.beziers[selected].setName(name);
+    }
+    // Focuses on the selected bezier curve
     updateFocus() {
-        deselect_button.style.display = 'inline-block';
         for (let i = 0; i < this.beziers.length; i++) {
             this.beziers[i].unfocus();
         }
@@ -247,6 +270,10 @@ export default class BezierSet {
     }
     // Adds a new bezier curve
     addBezier() {
+        if (adding) {
+            alert('Finish adding the current curve first')
+            return;
+        }
         let b = new Bezier();
         this.beziers.push(b);
         b.addSegment();
@@ -269,6 +296,8 @@ export default class BezierSet {
     select(k) {
         selected = k;
         this.updateFocus();
+        name_text.style.display = 'inline-block';
+        deselect_button.style.display = 'inline-block';
     }
     // Deselct bezier curve
     deselect() {
@@ -276,6 +305,7 @@ export default class BezierSet {
         this.updateFocus();
         // Hide deselect button
         deselect_button.style.display = 'none';
+        name_text.style.display = 'none';
     }
     // Add a new point to the selected bezier curve
     addPoint() {
