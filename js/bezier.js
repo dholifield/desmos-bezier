@@ -323,4 +323,38 @@ export default class BezierSet {
             alert('No curve selected');
         }
     }
+    // Copy the points of the selected bezier curve
+    copyPoints() {
+        if (this.beziers.length > 0) {
+            //var str = 'B\\left(a,w,t\\right)=\\left(\\sum_{n=\\left[1...\\operatorname{length}\\left(a\\right)-1\\right]}^{\\left[1...\\operatorname{length}\\left(a\\right)-1\\right]}\\left(\\left(a\\left[n\\right]\\right)\\left(-t^{3}+3t^{2}-3t+1\\right)+\\left(2a\\left[n\\right]-w\\left[n\\right]\\right)\\left(3t^{3}-6t^{2}+3t\\right)+\\left(w\\left[n+1\\right]\\right)\\left(-3t^{3}+3t^{2}\\right)+\\left(a\\left[n+1\\right]\\right)\\left(t^{3}\\right)\\right).x,\\sum_{n=\\left[1...\\operatorname{length}\\left(a\\right)-1\\right]}^{\\left[1...\\operatorname{length}\\left(a\\right)-1\\right]}\\left(\\left(a\\left[n\\right]\\right)\\left(-t^{3}+3t^{2}-3t+1\\right)+\\left(2a\\left[n\\right]-w\\left[n\\right]\\right)\\left(3t^{3}-6t^{2}+3t\\right)+\\left(w\\left[n+1\\right]\\right)\\left(-3t^{3}+3t^{2}\\right)+\\left(a\\left[n+1\\right]\\right)\\left(t^{3}\\right)\\right).y\\right)\n';
+            var str = '';
+            for (let j = 0; j < this.beziers.length; j++) {
+                this.select(j);
+                // format anchor points
+                str += ' \na_{'+this.beziers[j].name+'}=[';
+                for (let i = 0; i < this.beziers[j].anchor_x.length; i++) {
+                    str += `(${this.beziers[j].anchor_x[i]},${this.beziers[j].anchor_y[i]})`;
+                    if (i != this.beziers[j].anchor_x.length-1) str += ',';
+                }
+                // format weight points
+                str += ']\nw_{'+this.beziers[j].name+'}=[';
+                for (let i = 0; i < this.beziers[j].weight_x.length; i++) {
+                    str += `(${this.beziers[j].weight_x[i]},${this.beziers[j].weight_y[i]})`;
+                    if (i != this.beziers[j].weight_x.length-1) str += ',';
+                }
+                // add bezier curve
+                str += ']\nB_{ez}(a_{'+this.beziers[j].name+'},w_{'+this.beziers[j].name+'},t)\n';
+            }
+            this.deselect();
+            navigator.clipboard.writeText(str);
+        }
+        else {
+            alert('No curves to copy');
+        }
+    }
+    // Copy the bezier spline equation
+    copyEqn() {
+        var str = 'B_{ez}\\left(a,w,t\\right)=\\left(\\sum_{n=\\left[1...\\operatorname{length}\\left(a\\right)-1\\right]}^{\\left[1...\\operatorname{length}\\left(a\\right)-1\\right]}\\left(\\left(a\\left[n\\right]\\right)\\left(-t^{3}+3t^{2}-3t+1\\right)+\\left(2a\\left[n\\right]-w\\left[n\\right]\\right)\\left(3t^{3}-6t^{2}+3t\\right)+\\left(w\\left[n+1\\right]\\right)\\left(-3t^{3}+3t^{2}\\right)+\\left(a\\left[n+1\\right]\\right)\\left(t^{3}\\right)\\right).x,\\sum_{n=\\left[1...\\operatorname{length}\\left(a\\right)-1\\right]}^{\\left[1...\\operatorname{length}\\left(a\\right)-1\\right]}\\left(\\left(a\\left[n\\right]\\right)\\left(-t^{3}+3t^{2}-3t+1\\right)+\\left(2a\\left[n\\right]-w\\left[n\\right]\\right)\\left(3t^{3}-6t^{2}+3t\\right)+\\left(w\\left[n+1\\right]\\right)\\left(-3t^{3}+3t^{2}\\right)+\\left(a\\left[n+1\\right]\\right)\\left(t^{3}\\right)\\right).y\\right)';
+        navigator.clipboard.writeText(str);
+    }
 }

@@ -9,6 +9,8 @@
 }
 
 body {
+  font-family: robotomono;
+  font-size: 15 px;
   color: white;
   background-color: #282C34;
   margin: 0;
@@ -76,7 +78,7 @@ button.deselect {
 }
 
 button.deselect:hover {
-  background: #d96d6d;
+  background: #dd7777;
 }
 
 input {
@@ -90,4 +92,16 @@ input {
   border-radius: 3px;
   margin: 5px;
   text-decoration: underline;
+}
+
+button.save {
+  background: #B3E6B5;
+}
+
+button.save:hover {
+  background: #9dd19e;
+}
+
+button.save:active {
+  background: #8cc08d;
 }

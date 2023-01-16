@@ -13,18 +13,25 @@
 
     <body>
         <!-- add calculator -->
-        <div id="calculator" style="width: calc(100vh - 200px); height: calc(100vh - 200px); margin: 100px auto; margin-bottom: 10px;"></div>
+        <div id="calculator" style="width: calc(100vw - 300px); height: calc(100vh - 300px); margin: 150px auto; margin-bottom: 10px;"></div>
         <script type="module" defer src="js/main.js"></script>
 
         <!-- add buttons -->
-        <button onclick="B.addPoint()">add point</button>
-        <button onclick="B.removePoint()">remove point</button>
-        <button class="B" onclick="B.addBezier()">add bezier</button>
-        <button class="B" onclick="B.removeBezier(selected)">remove bezier</button>
-        
-        <!-- add text boxed and deselect button -->
-        <input type="text" id="color_text" value="#000000" onkeydown="typing = true" onkeyup="typing = false" onchange="B.setColor(value)">
-        <input type="text" id="name_text" style="display: none; width: 200px;" onkeydown="typing = true" onkeyup="typing = false" onchange="B.setName(value)">
-        <button class="deselect" id="deselect_button" style="display: none;" onclick="B.deselect()">deselect</button>
+        <div>
+            <button class="save" onclick="B.copyEqn()">copy bezier spline equation</button>
+            <button class="save" id="copy_points" onclick="B.copyPoints()">copy points</button>
+            [press space to add more points]
+        </div>
+        <div>
+            <button class="B" onclick="B.addBezier()">add bezier</button>
+            <button class="B" onclick="B.removeBezier(selected)">remove bezier</button>
+            <button onclick="B.addPoint()">add point</button>
+            <button onclick="B.removePoint()">remove point</button>
+    
+            <!-- add text boxed and deselect button -->
+            <input type="text" id="color_text" value="#000000" onkeydown="typing = true" onkeyup="typing = false" onchange="B.setColor(value)">
+            <input type="text" id="name_text" style="display: none; width: 200px;" onkeydown="typing = true" onkeyup="typing = false" onchange="B.setName(value)">
+            <button class="deselect" id="deselect_button" style="display: none;" onclick="B.deselect()">deselect</button>
+        </div>
     </body>
 </html>
